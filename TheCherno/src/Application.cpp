@@ -37,7 +37,6 @@ int main(void)
     }
     std::cout << glGetString(GL_VERSION) << std::endl;
 
-    // Pass data to OpenGL
     {
         float positions[6] = {
             -0.5f, -0.5f,
@@ -46,10 +45,16 @@ int main(void)
         };
 
         unsigned int buffer;
-        glGenBuffers(1, &buffer);  // qty of buffers and ID
+        // generate 1 buffer and assign it an id
+        glGenBuffers(1, &buffer);
+        // select the buffer
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
-        // specify size in bytes. Could be sizeof(positions)
+        // specify size in bytes. Could be sizeof(positions) and pass it data
         glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+
+        // Tell OpenGL how to interpret the buffer
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 2, 0);
     }
 
     /* Loop until the user closes the window */
