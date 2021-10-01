@@ -13,6 +13,33 @@ References:
 #include <iostream>
 #include <fstream>
 
+// __debugbreak is MSVC specific.
+#define ASSERT(x) if (!(x)) __debugbreak();
+#define GLCall(x) GL_clear_error();\
+                  x;\
+                  ASSERT(GL_log_call(#x, __FILE__, __LINE__))
+
+static void
+GL_clear_error()
+{
+    while (glGetError() != GL_NO_ERROR)
+    {
+
+    }
+}
+
+static bool
+GL_log_call(const char* function, const char* file, int line)
+{
+    while (GLenum error = glGetError())
+    {
+        std::cout << "[OpenGL error] (" << error << ") on " << function
+            << " in " << file << "@" << line << std::endl;
+        return false;
+    }
+    return true;
+}
+
 std::string
 read_text_file(const char* path)
 {
@@ -142,7 +169,7 @@ main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         // How does OpenGL know what arrays to draw?
         // It knows because OpenGL is a state machine!
