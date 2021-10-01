@@ -119,8 +119,8 @@ main(void)
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 2, 0);
 
-        std::string vertex_shader = read_text_file("C:\\dev\\OpenGL\\TheCherno\\TheCherno\\src\\vertex.shader.txt");
-        std::string fragment_shader = read_text_file("C:\\dev\\OpenGL\\TheCherno\\TheCherno\\src\\fragment.shader.txt");
+        std::string vertex_shader = read_text_file("res/shaders/basic_vertex.glsl");
+        std::string fragment_shader = read_text_file("res/shaders/basic_fragment.glsl");
         shader = create_shader(vertex_shader, fragment_shader);
         glUseProgram(shader);
     }
