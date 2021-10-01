@@ -102,10 +102,16 @@ main(void)
     unsigned int buffer = 0;
     unsigned int shader = 0;
     {
-        float positions[6] = {
+        float positions[] = {
             -0.5f, -0.5f,
-            +0.0f, +0.5f,
-            +0.5f, -0.5f
+            +0.5f, -0.5f,
+            +0.5f, +0.5f,
+            -0.5f, +0.5f
+        };
+
+        unsigned int indices[] = {
+            0, 1, 2,
+            2, 3, 0
         };
 
         // generate 1 buffer and assign it an id
@@ -113,11 +119,16 @@ main(void)
         // select the buffer
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         // specify size in bytes. Could be sizeof(positions) and pass it data
-        glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
 
         // Tell OpenGL how to interpret the buffer
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 2, 0);
+
+        unsigned int ibo = 0;
+        glGenBuffers(1, &ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
         std::string vertex_shader = read_text_file("res/shaders/basic_vertex.glsl");
         std::string fragment_shader = read_text_file("res/shaders/basic_fragment.glsl");
@@ -130,6 +141,8 @@ main(void)
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         // How does OpenGL know what arrays to draw?
         // It knows because OpenGL is a state machine!
