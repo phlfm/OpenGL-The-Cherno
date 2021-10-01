@@ -120,6 +120,8 @@ main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1);
+
     if (glewInit() != GLEW_OK)
     {
         std::cout << "Glew Init error!" << std::endl;
@@ -128,6 +130,7 @@ main(void)
 
     unsigned int buffer = 0;
     unsigned int shader = 0;
+    int location = -1;
     {
         float positions[] = {
             -0.5f, -0.5f,
@@ -161,7 +164,13 @@ main(void)
         std::string fragment_shader = read_text_file("res/shaders/basic_fragment.glsl");
         shader = create_shader(vertex_shader, fragment_shader);
         GLCall(glUseProgram(shader));
+
+        location = glGetUniformLocation(shader, "u_color");
+        ASSERT(location != -1);
     }
+
+    float multiplier = 1.0f;
+    float increment = 0.005f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -169,6 +178,14 @@ main(void)
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
+        GLCall(glUniform4f(location, 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f));
+        multiplier -= increment;
+        if (multiplier < 0.3f) {
+            increment = -increment;
+        }
+        else if (multiplier >= 1.0f) {
+            increment = -increment;
+        }
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         // How does OpenGL know what arrays to draw?
