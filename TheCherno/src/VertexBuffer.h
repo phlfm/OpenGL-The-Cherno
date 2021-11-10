@@ -8,11 +8,11 @@ public:
 	VertexBuffer(const void* data, unsigned int size);
 	~VertexBuffer();
 
-	void Bind() const;
-	void Unbind() const;
+	void bind() const;
+	void unbind() const;
 
 private:
-	unsigned int m_RendererID = 0;
+	unsigned int m_RendererID;
 };
 
 #endif // H_VERTEXBUFFER
