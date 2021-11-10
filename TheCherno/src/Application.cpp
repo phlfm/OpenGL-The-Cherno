@@ -13,32 +13,10 @@ References:
 #include <iostream>
 #include <fstream>
 
-// __debugbreak is MSVC specific.
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GL_clear_error();\
-                  x;\
-                  ASSERT(GL_log_call(#x, __FILE__, __LINE__))
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
-static void
-GL_clear_error()
-{
-    while (glGetError() != GL_NO_ERROR)
-    {
-
-    }
-}
-
-static bool
-GL_log_call(const char* function, const char* file, int line)
-{
-    while (GLenum error = glGetError())
-    {
-        std::cout << "[OpenGL error] (" << error << ") on " << function
-            << " in " << file << "@" << line << std::endl;
-        return false;
-    }
-    return true;
-}
 
 std::string
 read_text_file(const char* path)
@@ -132,12 +110,10 @@ main(void)
     }
     std::cout << glGetString(GL_VERSION) << std::endl;
 
-    unsigned int buffer = 0;
-    unsigned int shader = 0;
-    int location = -1;
-    unsigned int vao = 0;
-    unsigned int ibo = 0;
     {
+        unsigned int shader = 0;
+        unsigned int vao = 0;
+
         float positions[] = {
             -0.5f, -0.5f,
             +0.5f, -0.5f,
@@ -153,75 +129,69 @@ main(void)
         GLCall(glGenVertexArrays(1, &vao));
         GLCall(glBindVertexArray(vao));
 
-        // generate 1 buffer and assign it an id
-        GLCall(glGenBuffers(1, &buffer));
-        // select the buffer
-        GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-        // specify size in bytes. Could be sizeof(positions) and pass it data
-        GLCall(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
+        VertexBuffer vb(positions, 4 * 2 * sizeof(float));
 
         // Tell OpenGL how to interpret the buffer
         GLCall(glEnableVertexAttribArray(0));
         GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 2, 0));
         // The line above (AttribPointer) "links" the array_buffer with the VAO
 
-        GLCall(glGenBuffers(1, &ibo));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-        GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
+        IndexBuffer ib(indices, 6);
 
         std::string vertex_shader = read_text_file("res/shaders/basic_vertex.glsl");
         std::string fragment_shader = read_text_file("res/shaders/basic_fragment.glsl");
         shader = create_shader(vertex_shader, fragment_shader);
         GLCall(glUseProgram(shader));
 
+        int location = -1;
         location = glGetUniformLocation(shader, "u_color");
         ASSERT(location != -1);
-    }
 
-    // Unbind all
-    GLCall(glBindVertexArray(0));
-    GLCall(glUseProgram(0));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
-    float multiplier = 1.0f;
-    float increment = 0.005f;
+        // Unbind all
+        GLCall(glBindVertexArray(0));
+        GLCall(glUseProgram(0));
+        GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        /* Render here */
-        GLCall(glClear(GL_COLOR_BUFFER_BIT));
+        float multiplier = 1.0f;
+        float increment = 0.015f;
 
-        GLCall(glUseProgram(shader));
-        GLCall(glUniform4f(location, 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f));
-        multiplier -= increment;
-        if (multiplier < 0.3f) {
-            increment = -increment;
+        /* Loop until the user closes the window */
+        while (!glfwWindowShouldClose(window))
+        {
+            /* Render here */
+            GLCall(glClear(GL_COLOR_BUFFER_BIT));
+
+            GLCall(glUseProgram(shader));
+            GLCall(glUniform4f(location, 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f));
+            multiplier -= increment;
+            if (multiplier < 0.3f) {
+                increment = -increment;
+            }
+            else if (multiplier >= 1.0f) {
+                increment = -increment;
+            }
+
+            GLCall(glBindVertexArray(vao));
+            ib.Bind();
+
+            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+            // How does OpenGL know what arrays to draw?
+            // It knows because OpenGL is a state machine!
+            // We told it what to draw with glBindBuffer.
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+
+            /* Poll for and process events */
+            glfwPollEvents();
         }
-        else if (multiplier >= 1.0f) {
-            increment = -increment;
-        }
 
-        GLCall(glBindVertexArray(vao));
-        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-
-        // How does OpenGL know what arrays to draw?
-        // It knows because OpenGL is a state machine!
-        // We told it what to draw with glBindBuffer.
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
+        glDeleteProgram(shader);
     }
-
-    glDeleteProgram(shader);
-
     glfwTerminate();
     return 0;
 }
