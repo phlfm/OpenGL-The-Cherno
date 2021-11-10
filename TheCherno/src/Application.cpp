@@ -149,7 +149,7 @@ main(void)
         // select the buffer
         GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
         // specify size in bytes. Could be sizeof(positions) and pass it data
-        GLCall(glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
+        GLCall(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
 
         // Tell OpenGL how to interpret the buffer
         GLCall(glEnableVertexAttribArray(0));
