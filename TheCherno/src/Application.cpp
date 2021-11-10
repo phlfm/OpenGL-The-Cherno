@@ -108,13 +108,17 @@ main(void)
     if (!glfwInit())
         return -1;
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
-        return -1;
+        return -2;
     }
 
     /* Make the window's context current */
@@ -131,6 +135,8 @@ main(void)
     unsigned int buffer = 0;
     unsigned int shader = 0;
     int location = -1;
+    unsigned int vao = 0;
+    unsigned int ibo = 0;
     {
         float positions[] = {
             -0.5f, -0.5f,
@@ -144,6 +150,9 @@ main(void)
             2, 3, 0
         };
 
+        GLCall(glGenVertexArrays(1, &vao));
+        GLCall(glBindVertexArray(vao));
+
         // generate 1 buffer and assign it an id
         GLCall(glGenBuffers(1, &buffer));
         // select the buffer
@@ -154,8 +163,8 @@ main(void)
         // Tell OpenGL how to interpret the buffer
         GLCall(glEnableVertexAttribArray(0));
         GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 2, 0));
+        // The line above (AttribPointer) "links" the array_buffer with the VAO
 
-        unsigned int ibo = 0;
         GLCall(glGenBuffers(1, &ibo));
         GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
         GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
@@ -169,6 +178,12 @@ main(void)
         ASSERT(location != -1);
     }
 
+    // Unbind all
+    GLCall(glBindVertexArray(0));
+    GLCall(glUseProgram(0));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+
     float multiplier = 1.0f;
     float increment = 0.005f;
 
@@ -178,6 +193,7 @@ main(void)
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
+        GLCall(glUseProgram(shader));
         GLCall(glUniform4f(location, 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f));
         multiplier -= increment;
         if (multiplier < 0.3f) {
@@ -186,6 +202,10 @@ main(void)
         else if (multiplier >= 1.0f) {
             increment = -increment;
         }
+
+        GLCall(glBindVertexArray(vao));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         // How does OpenGL know what arrays to draw?
