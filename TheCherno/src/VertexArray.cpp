@@ -3,12 +3,12 @@
 
 VertexArray::VertexArray()
 {
-	GLCall(glGenVertexArrays(1, &m_RendererID));
+	GLCall(glGenVertexArrays(1, &m_rendererID));
 }
 
 VertexArray::~VertexArray()
 {
-	GLCall(glDeleteVertexArrays(1, &m_RendererID));
+	GLCall(glDeleteVertexArrays(1, &m_rendererID));
 }
 
 void
@@ -40,5 +40,5 @@ VertexArray::unbind() const
 void
 VertexArray::bind() const
 {
-	GLCall(glBindVertexArray(m_RendererID));
+	GLCall(glBindVertexArray(m_rendererID));
 }

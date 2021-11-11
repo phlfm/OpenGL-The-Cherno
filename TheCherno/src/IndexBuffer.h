@@ -14,7 +14,7 @@ public:
 	inline unsigned int get_count() const { return m_Count; }
 
 private:
-	unsigned int m_RendererID = 0;
+	unsigned int m_rendererID = 0;
 	unsigned int m_Count = 0;
 };
 

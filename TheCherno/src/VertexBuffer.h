@@ -12,7 +12,7 @@ public:
 	void unbind() const;
 
 private:
-	unsigned int m_RendererID;
+	unsigned int m_rendererID;
 };
 
 #endif // H_VERTEXBUFFER
