@@ -56,19 +56,22 @@ main(void)
     {
 
         float positions[] = {
-            -0.5f, -0.5f,
-            +0.5f, -0.5f,
-            +0.5f, +0.5f,
-            -0.5f, +0.5f
+            -0.7f, -0.5f,
+            +0.7f, -0.5f,
+            +0.7f, +0.5f,
+            -0.7f, +0.5f,
+            +0.3f, +0.5f,
+            -0.3f, -0.5f,
         };
 
         unsigned int indices[] = {
-            0, 1, 2,
-            2, 3, 0
+            0, 3, 4,
+            1, 2, 5
         };
 
         VertexArray va{};
-        VertexBuffer vb{ positions, 4 * 2 * sizeof(float) };
+        // sizeof(positions) could be len(positions) * 2 * sizeof(float)
+        VertexBuffer vb{ positions, sizeof(positions) };
 
         VertexBufferLayout layout{};
         layout.push<float>(2);
