@@ -28,3 +28,20 @@ GL_log_call(const char* function, const char* file, int line)
     }
     return true;
 }
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+{
+    shader.bind();
+    va.bind();
+    ib.bind();
+    GLCall(glDrawElements(GL_TRIANGLES, ib.get_count(), GL_UNSIGNED_INT, nullptr));
+    /*
+    Should we unbind shader / va / ib?
+    It *sometimes* is useful for debugging but in release it's just a waste of performance
+    */
+}
+
+void Renderer::Clear() const
+{
+    GLCall(glClear(GL_COLOR_BUFFER_BIT));
+}

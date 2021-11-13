@@ -77,7 +77,8 @@ main(void)
         IndexBuffer ib(indices, 6);
 
         Shader shader("res/shaders/basic");
-        shader.bind();
+        
+        Renderer renderer;
 
         // Unbind all
         va.unbind();
@@ -86,14 +87,16 @@ main(void)
         shader.unbind();
 
         float multiplier = 1.0f;
-        float increment = 0.015f;
+        float increment = 0.05f;
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
             /* Render here */
-            GLCall(glClear(GL_COLOR_BUFFER_BIT));
+            renderer.Clear();
+            renderer.Draw(va, ib, shader);
 
+            // Later we'll abstract this uniform setting into materials
             shader.bind();
             shader.SetUniform4f("u_color", { 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f });
             multiplier -= increment;
@@ -103,16 +106,6 @@ main(void)
             else if (multiplier >= 1.0f) {
                 increment = -increment;
             }
-
-            va.bind();
-            ib.bind();
-
-            GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
-
-            // How does OpenGL know what arrays to draw?
-            // It knows because OpenGL is a state machine!
-            // We told it what to draw with glBindBuffer.
-            glDrawArrays(GL_TRIANGLES, 0, 3);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);

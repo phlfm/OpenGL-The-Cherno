@@ -3,7 +3,8 @@
 #define H_VERTEXARRAY
 
 #include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
+
+class VertexBufferLayout;
 
 class VertexArray
 {
