@@ -25,8 +25,6 @@ References:
 int
 main(void)
 {
-    GLFWwindow* window;
-
     /* Initialize the library */
     if (!glfwInit())
         return -1;
@@ -37,7 +35,7 @@ main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    GLFWwindow* window{ glfwCreateWindow(640, 480, "Hello World", NULL, NULL) };
     if (!window)
     {
         glfwTerminate();
