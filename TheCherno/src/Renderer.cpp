@@ -18,7 +18,7 @@ GL_clear_error()
 }
 
 bool
-GL_log_call(const char* function, const char* file, int line)
+GL_log_call(const char *function, const char *file, int line)
 {
     while (GLenum error = glGetError())
     {
@@ -29,7 +29,7 @@ GL_log_call(const char* function, const char* file, int line)
     return true;
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+void Renderer::Draw(const VertexArray &va, const IndexBuffer &ib, const Shader &shader) const
 {
     shader.bind();
     va.bind();

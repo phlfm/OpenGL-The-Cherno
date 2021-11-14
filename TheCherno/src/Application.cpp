@@ -20,6 +20,7 @@ References:
 #include "VertexBufferLayout.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 
 int
@@ -35,7 +36,7 @@ main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWwindow* window{ glfwCreateWindow(640, 480, "Hello World", NULL, NULL) };
+    GLFWwindow *window{ glfwCreateWindow(566, 555, "Hello World", NULL, NULL) };
     if (!window)
     {
         glfwTerminate();
@@ -55,25 +56,27 @@ main(void)
 
     {
 
+        GLCall(glEnable(GL_BLEND)); 
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
         float positions[] = {
-            -0.7f, -0.5f,
-            +0.7f, -0.5f,
-            +0.7f, +0.5f,
-            -0.7f, +0.5f,
-            +0.3f, +0.5f,
-            -0.3f, -0.5f,
+            -0.5f, -0.5f, 0.0f, 0.0f, // 0
+            +0.5f, -0.5f, 1.0f, 0.0f, // 1
+            +0.5f, +0.5f, 1.0f, 1.0f, // 2
+            -0.5f, +0.5f, 0.0f, 1.0f // 3
         };
 
         unsigned int indices[] = {
-            0, 3, 4,
-            1, 2, 5
+            0, 1, 2,
+            2, 3, 0
         };
 
         VertexArray va{};
-        // sizeof(positions) could be len(positions) * 2 * sizeof(float)
-        VertexBuffer vb{ positions, sizeof(positions) };
+        // sizeof(positions) could be len(positions) * 4 * sizeof(float)
+        VertexBuffer vb{ positions, 4 * 4 * sizeof(float) };
 
         VertexBufferLayout layout{};
+        layout.push<float>(2);
         layout.push<float>(2);
         va.add_buffer(vb, layout);
 
@@ -83,6 +86,13 @@ main(void)
         
         Renderer renderer;
 
+        Texture texture("res/textures/pikachu.png");
+        unsigned int texture_slot{ 0 };
+        texture.bind(texture_slot);
+
+        shader.bind();
+        shader.setUniform1i("u_texture", texture_slot);
+        
         // Unbind all
         va.unbind();
         vb.unbind();
@@ -101,14 +111,14 @@ main(void)
 
             // Later we'll abstract this uniform setting into materials
             shader.bind();
-            shader.SetUniform4f("u_color", { 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f });
-            multiplier -= increment;
-            if (multiplier < 0.3f) {
-                increment = -increment;
-            }
-            else if (multiplier >= 1.0f) {
-                increment = -increment;
-            }
+            //shader.setUniform4f("u_color", { 0.4f * multiplier, 0.1f * multiplier, 0.7f * multiplier, 1.0f });
+            //multiplier -= increment;
+            //if (multiplier < 0.3f) {
+            //    increment = -increment;
+            //}
+            //else if (multiplier >= 1.0f) {
+            //    increment = -increment;
+            //}
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);

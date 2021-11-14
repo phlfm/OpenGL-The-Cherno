@@ -5,7 +5,7 @@
 #include "GL/glew.h"
 
 std::string
-read_text_file(const char* path)
+read_text_file(const char *path)
 {
     std::ifstream file_stream(path);
     file_stream.seekg(0, std::ios::end);
@@ -17,7 +17,7 @@ read_text_file(const char* path)
 }
 
 unsigned int
-Shader::compileShader(unsigned int type, const std::string& source)
+Shader::compileShader(unsigned int type, const std::string &source)
 {
     unsigned int id{ glCreateShader(type) };
     const char* src{ source.c_str() };
@@ -44,7 +44,7 @@ Shader::compileShader(unsigned int type, const std::string& source)
 }
 
 unsigned int
-Shader::createShader(const std::string& vertex_shader_code, const std::string& fragment_shader_code)
+Shader::createShader(const std::string &vertex_shader_code, const std::string &fragment_shader_code)
 {
     unsigned int program = glCreateProgram();
     unsigned int vs = compileShader(GL_VERTEX_SHADER, vertex_shader_code);
@@ -64,7 +64,7 @@ Shader::createShader(const std::string& vertex_shader_code, const std::string& f
 }
 
 
-Shader::Shader(const std::string& filepath)
+Shader::Shader(const std::string &filepath)
 	: m_filePath(filepath)
 {
     std::string vertex_shader_code = read_text_file((filepath + "_vertex.glsl").c_str());
@@ -87,8 +87,8 @@ void Shader::unbind() const
     GLCall(glUseProgram(0));
 }
 
-unsigned int
-Shader::GetUniformLocation(const std::string& name)
+int
+Shader::GetUniformLocation(const std::string &name)
 {
     if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
         return m_uniformLocationCache[name];
@@ -103,7 +103,12 @@ Shader::GetUniformLocation(const std::string& name)
 }
 
 void
-Shader::SetUniform4f(const std::string& name, vec4f floats)
+Shader::setUniform4f(const std::string &name, vec4f floats)
 {
     GLCall(glUniform4f(GetUniformLocation(name), floats.v0, floats.v1, floats.v2, floats.v3));
+}
+
+void Shader::setUniform1i(const std::string& name, int value)
+{
+    GLCall(glUniform1i(GetUniformLocation(name), value));
 }

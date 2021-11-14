@@ -14,7 +14,7 @@ VertexArray::~VertexArray()
 }
 
 void
-VertexArray::add_buffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
+VertexArray::add_buffer(const VertexBuffer &vb, const VertexBufferLayout &layout)
 {
 	bind();
 	vb.bind();

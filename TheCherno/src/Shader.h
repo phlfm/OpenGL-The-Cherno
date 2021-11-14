@@ -22,22 +22,23 @@ private:
 	std::unordered_map<std::string, int> m_uniformLocationCache;
 
 	unsigned int
-	createShader(const std::string& vertex_shader, const std::string& fragment_shader);
+	createShader(const std::string &vertex_shader, const std::string &fragment_shader);
 
 	unsigned int
-	compileShader(unsigned int type, const std::string& source);
+	compileShader(unsigned int type, const std::string &source);
 
-	unsigned int GetUniformLocation(const std::string& name);
+	int GetUniformLocation(const std::string &name);
 
 public:
-	Shader(const std::string& filepath);
+	Shader(const std::string &filepath);
 	~Shader();
 
 
 	void bind() const;
 	void unbind() const;
 
-	void SetUniform4f(const std::string& name, vec4f floats);
+	void setUniform4f(const std::string &name, vec4f floats);
+	void setUniform1i(const std::string& name, int value);
 };
 
 #endif // H_SHADER
